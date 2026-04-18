@@ -70,8 +70,8 @@ def proxy_download():
             mimetype = f'audio/{ext}'
             
         elif quality == 'normal':
-            # ffmpeg නැතුව ගන්න පුළුවන් හොඳම තනි ෆයිල් එක
-            ydl_opts['format'] = 'b' 
+            # ffmpeg එක පාවිච්චි කරලා හරි තියෙන හොඳම එක mp4 විදිහට ගන්නවා
+            ydl_opts['format'] = 'best[ext=mp4]/best' 
             mimetype = 'video/mp4'
             
         else: 
