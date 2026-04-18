@@ -65,14 +65,15 @@ def proxy_download():
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': ext, # mp3 ද m4a ද කියලා තීරණය කරන්නේ මෙතනින්
-                'preferredquality': '192',
+                'preferredquality': '320', # 192 වෙනුවට 320 දැම්මා උපරිම කොලිටියට
             }]
             mimetype = f'audio/{ext}'
             final_filepath = f"{base_path}.{ext}"
             download_filename = f"{safe_title}.{ext}"
 
         elif quality == 'normal':
-            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/bv+ba/b'
+            # Normal කොලිටිය 480p වලට සීමා කළා
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best/bv+ba/b'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
