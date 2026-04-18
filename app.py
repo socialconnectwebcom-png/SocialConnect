@@ -59,7 +59,7 @@ def proxy_download():
             'no_warnings': True,
         }
 
-        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම
+        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම (අලුත්ම ලොජික් එක)
         if quality == 'audio':
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
@@ -70,20 +70,22 @@ def proxy_download():
             mimetype = f'audio/{ext}'
             
         elif quality == 'normal':
-            # ffmpeg එක පාවිච්චි කරලා හරි තියෙන හොඳම එක mp4 විදිහට ගන්නවා
-            ydl_opts['format'] = 'best[ext=mp4]/best' 
+            # Normal වලදී: තියෙන එකක් අරන් අනිවාර්යයෙන්ම MP4 කරනවා (Error එන්නේ නෑ)
+            ydl_opts['format'] = 'best[ext=mp4]/best[ext=webm]/best/bv+ba/b' 
+            ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             
         else: 
-            # Premium - වීඩියෝ එකයි ඕඩියෝ එකයි ffmpeg වලින් එකතු කරනවා
-            ydl_opts['format'] = 'bv*+ba/b' 
+            # Premium වලදී: උපරිම කොලිටිය (4K/1080p) තියෙන වීඩියෝව සහ හොඳම ඕඩියෝව එකතු කරනවා
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best/bv*+ba*' 
+            ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
 
         # වීඩියෝ එක සර්වර් එකට ඩවුන්ලෝඩ් කිරීම
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # ඩවුන්ලෝඩ් වුණ ෆයිල් එක පීසී එකට යැවීම (නම සහ Format එකත් එක්ක)
+        # ඩවුන්ලෝඩ් වුණ ෆයිල් එක පීසී එකට යැවීම
         return send_file(
             filepath,
             as_attachment=True,
