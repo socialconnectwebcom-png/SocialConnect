@@ -59,7 +59,7 @@ def proxy_download():
             'no_warnings': True,
         }
 
-        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම (අලුත්ම ලොජික් එක)
+        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම
         if quality == 'audio':
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
@@ -70,8 +70,9 @@ def proxy_download():
             mimetype = f'audio/{ext}'
             
         elif quality == 'normal':
-            # Normal වලදී: තියෙන එකක් අරන් අනිවාර්යයෙන්ම MP4 කරනවා (Error එන්නේ නෑ)
-            ydl_opts['format'] = 'best[ext=mp4]/best[ext=webm]/best/bv+ba/b' 
+            # Normal වලදී: උපරිම උස 720p (හෝ ඊට අඩු) වන වීඩියෝවක් පමණක් තෝරයි.
+            # ඒක අනිවාර්යයෙන්ම mp4 කරනවා (Error එන්නේ නෑ)
+            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/bv+ba/b' 
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             
