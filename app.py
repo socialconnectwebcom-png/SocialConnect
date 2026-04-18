@@ -38,59 +38,60 @@ def fetch_video():
 def proxy_download():
     url = request.args.get('url')
     title = request.args.get('title', 'SocialConnect_Download')
-    ext = request.args.get('ext', 'mp4')
+    ext = request.args.get('ext', 'mp4') # Ext එක frontend එකෙන් එනවා (mp4, m4a, mp3)
     quality = request.args.get('quality', 'premium')
 
     if not url:
         return "URL is required", 400
 
-    # අමුතු අකුරු අයින් කරලා ෆයිල් එකේ නම හදාගන්නවා (Crash වීම නවත්වන්න)
+    # අමුතු අකුරු අයින් කරලා ෆයිල් එකේ නම හදාගන්නවා
     safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
     if not safe_title:
-        safe_title = "SocialConnect_Video"
-        
-    filename = f"{safe_title}.{ext}"
-    filepath = os.path.join(DOWNLOAD_DIR, filename)
+        safe_title = "SocialConnect_Audio_Video"
+
+    # අලුත් ලොජික් එක: outtmpl එකට %(ext)s දෙනවා
+    base_path = os.path.join(DOWNLOAD_DIR, safe_title)
 
     try:
         ydl_opts = {
-            'outtmpl': filepath,
+            'outtmpl': f"{base_path}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
         }
 
-        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම
         if quality == 'audio':
+            # Music වලට අදාළ කොටස
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': ext,
+                'preferredcodec': ext, # mp3 ද m4a ද කියලා තීරණය කරන්නේ මෙතනින්
                 'preferredquality': '192',
             }]
             mimetype = f'audio/{ext}'
-            
-        elif quality == 'normal':
-            # Normal වලදී: උපරිම උස 720p (හෝ ඊට අඩු) වන වීඩියෝවක් පමණක් තෝරයි.
-            # ඒක අනිවාර්යයෙන්ම mp4 කරනවා (Error එන්නේ නෑ)
-            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/bv+ba/b' 
-            ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
-            
-        else: 
-            # Premium වලදී: උපරිම කොලිටිය (4K/1080p) තියෙන වීඩියෝව සහ හොඳම ඕඩියෝව එකතු කරනවා
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best/bv*+ba*' 
-            ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
+            final_filepath = f"{base_path}.{ext}"
+            download_filename = f"{safe_title}.{ext}"
 
-        # වීඩියෝ එක සර්වර් එකට ඩවුන්ලෝඩ් කිරීම
+        elif quality == 'normal':
+            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/bv+ba/b'
+            ydl_opts['merge_output_format'] = 'mp4'
+            mimetype = 'video/mp4'
+            final_filepath = f"{base_path}.mp4"
+            download_filename = f"{safe_title}.mp4"
+
+        else:
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best/bv*+ba*'
+            ydl_opts['merge_output_format'] = 'mp4'
+            mimetype = 'video/mp4'
+            final_filepath = f"{base_path}.mp4"
+            download_filename = f"{safe_title}.mp4"
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # ඩවුන්ලෝඩ් වුණ ෆයිල් එක පීසී එකට යැවීම
         return send_file(
-            filepath,
+            final_filepath,
             as_attachment=True,
-            download_name=filename,
+            download_name=download_filename,
             mimetype=mimetype
         )
 
