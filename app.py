@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Temporary folder to store downloaded files
+# ඩවුන්ලෝඩ් වෙන ෆයිල්ස් තියාගන්න ෆෝල්ඩර් එක
 DOWNLOAD_DIR = "downloads"
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
@@ -23,11 +23,12 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
+        # Fetch කරද්දී එරර් එන්නේ නැති වෙන්න සරලම විදිහට හැදුවා
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
             'cookiefile': 'cookies.txt',
-            'format': 'b'  # <-- FIX: Fetch කරන වෙලාවට Format Error එන එක නැවැත්තුවා
+            'noplaylist': True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -49,7 +50,7 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
-    # අමුතු අකුරු අයින් කරලා ෆයිල් එකේ නම හදාගන්නවා
+    # ෆයිල් නමේ තියෙන අමුතු අකුරු අයින් කරලා ලස්සනට හදාගන්නවා
     safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
     if not safe_title:
         safe_title = "SocialConnect_Audio_Video"
@@ -61,46 +62,43 @@ def proxy_download():
             'outtmpl': f"{base_path}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
-            'cookiefile': 'cookies.txt'
+            'cookiefile': 'cookies.txt',
+            'noplaylist': True
         }
 
         if quality == 'audio':
-            # Music වලට අදාළ කොටස
+            # Audio ඩවුන්ලෝඩ් කිරීම (Mp3)
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': ext, 
-                'preferredquality': '320', 
+                'preferredcodec': ext,
+                'preferredquality': '320',
             }]
-            mimetype = f'audio/{ext}'
-            final_filepath = f"{base_path}.{ext}"
-            download_filename = f"{safe_title}.{ext}"
-
+            
         elif quality == 'normal':
-            # Normal කොලිටිය 480p වලට සීමා කළා (Fallback 'b' එක්ක)
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/b'
+            # 480p Normal කොලිටිය - Codec අවුල් නැතිව MP4 විදිහට ඉල්ලනවා
+            ydl_opts['format'] = 'bestvideo[height<=480][vcodec^=avc]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
-            final_filepath = f"{base_path}.mp4"
-            download_filename = f"{safe_title}.mp4"
-
+            
         else:
-            # Premium - Format එක Fix කරා ඕනෑම එකක් Mp4 වලට Merge වෙන්න (Fallback 'b' එක්ක)
-            ydl_opts['format'] = 'bestvideo+bestaudio/best/b'
+            # Premium කොලිටිය - හැමෝටම ප්ලේ වෙන සාමාන්‍ය MP4 (H.264) එක ඉල්ලනවා (AV1 එරර් එක ෆික්ස් කරා)
+            ydl_opts['format'] = 'bestvideo[vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
-            final_filepath = f"{base_path}.mp4"
-            download_filename = f"{safe_title}.mp4"
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        return send_file(
-            final_filepath,
-            as_attachment=True,
-            download_name=download_filename,
-            mimetype=mimetype
-        )
+        # ඩවුන්ලෝඩ් වුණ ෆයිල් එක හරියටම හොයාගන්නවා
+        final_file = None
+        for f in os.listdir(DOWNLOAD_DIR):
+            if safe_title in f and not f.endswith('.part') and not f.endswith('.ytdl'):
+                final_file = os.path.join(DOWNLOAD_DIR, f)
+                break
+
+        if final_file:
+            return send_file(final_file, as_attachment=True)
+        else:
+            return "File not found after download", 500
 
     except Exception as e:
         return str(e), 500
