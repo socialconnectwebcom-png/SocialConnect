@@ -1,94 +1,98 @@
-import os
-import yt_dlp
-from flask import Flask, request, jsonify, Response, stream_with_context
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
+import yt_dlp
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-# සියලුම ඩොමේන් වලින් එන ඉල්ලීම් වලට අවසර දීම
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Temporary folder to store downloaded files
+DOWNLOAD_DIR = "downloads"
+if not os.path.exists(DOWNLOAD_DIR):
+    os.makedirs(DOWNLOAD_DIR)
 
-# අමතර ආරක්ෂිත CORS Headers (බ්‍රවුසර් බ්ලොක් එක සම්පූර්ණයෙන්ම නැති කිරීමට)
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
+@app.route('/')
+def home():
+    return "SocialConnect Server is Running!"
 
-TEMP_DIR = os.path.join(os.getcwd(), 'temp_downloads')
-os.makedirs(TEMP_DIR, exist_ok=True)
-
-@app.route('/fetch-video', methods=['POST', 'OPTIONS'])
-def get_video_info():
-    # බ්‍රවුසර් එකෙන් එන Preflight OPTIONS request එකට අවසර දීම
-    if request.method == 'OPTIONS':
-        return Response(status=200)
-        
+@app.route('/fetch-video', methods=['POST'])
+def fetch_video():
     data = request.json
     url = data.get('url')
-
-    if not url: return jsonify({"error": "No URL provided"}), 400
-
-    ydl_opts = { 'quiet': True, 'no_warnings': True, 'skip_download': True }
+    if not url:
+        return jsonify({'error': 'URL is required'}), 400
 
     try:
+        ydl_opts = {'quiet': True, 'no_warnings': True}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return jsonify({
-                "success": True,
-                "title": info.get('title', 'SocialConnect Video'),
-                "thumbnail": info.get('thumbnail', ''),
-                "original_url": url
+                'original_url': url,
+                'title': info.get('title', 'SocialConnect_Video'),
+                'thumbnail': info.get('thumbnail', ''),
             })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/download', methods=['GET'])
 def proxy_download():
-    original_url = request.args.get('url')
-    title = request.args.get('title', 'video')
+    url = request.args.get('url')
+    title = request.args.get('title', 'SocialConnect_Download')
     ext = request.args.get('ext', 'mp4')
     quality = request.args.get('quality', 'premium')
 
-    if not original_url: return "No URL", 400
+    if not url:
+        return "URL is required", 400
 
-    safe_title = "".join([c for c in title if c.isalnum() or c in [' ', '-', '_']]).strip()
-    if not safe_title: safe_title = "download"
-    
-    filepath = os.path.join(TEMP_DIR, f"{safe_title}.{ext}")
-
-    ydl_opts = { 'outtmpl': filepath, 'quiet': True, 'no_warnings': True }
-
-    if ext == 'mp4':
-        ydl_opts['merge_output_format'] = 'mp4' 
-        # ඕනෑම වීඩියෝ එකක තියෙන හොඳම කොලිටිය ඔටෝම තෝරාගන්න විදිහට හැදුවා
-        if quality == 'normal':
-            ydl_opts['format'] = 'best[height<=720]/best'
-        else:
-            ydl_opts['format'] = 'bestvideo+bestaudio/best'
-    else:
-        ydl_opts['format'] = 'bestaudio/best'
-        ydl_opts['extract_audio'] = True
-        ydl_opts['audio_format'] = ext
+    # අමුතු අකුරු අයින් කරලා ෆයිල් එකේ නම හදාගන්නවා (Crash වීම නවත්වන්න)
+    safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
+    if not safe_title:
+        safe_title = "SocialConnect_Video"
+        
+    filename = f"{safe_title}.{ext}"
+    filepath = os.path.join(DOWNLOAD_DIR, filename)
 
     try:
+        ydl_opts = {
+            'outtmpl': filepath,
+            'quiet': True,
+            'no_warnings': True,
+        }
+
+        # Quality එක අනුව යන්න ඕනේ විදිහ තීරණය කිරීම
+        if quality == 'audio':
+            ydl_opts['format'] = 'bestaudio/best'
+            ydl_opts['postprocessors'] = [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': ext,
+                'preferredquality': '192',
+            }]
+            mimetype = f'audio/{ext}'
+            
+        elif quality == 'normal':
+            # ffmpeg නැතුව ගන්න පුළුවන් හොඳම තනි ෆයිල් එක
+            ydl_opts['format'] = 'b' 
+            mimetype = 'video/mp4'
+            
+        else: 
+            # Premium - වීඩියෝ එකයි ඕඩියෝ එකයි ffmpeg වලින් එකතු කරනවා
+            ydl_opts['format'] = 'bv*+ba/b' 
+            mimetype = 'video/mp4'
+
+        # වීඩියෝ එක සර්වර් එකට ඩවුන්ලෝඩ් කිරීම
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([original_url])
+            ydl.download([url])
 
-        def generate():
-            with open(filepath, 'rb') as f:
-                while chunk := f.read(10 * 1024 * 1024): 
-                    yield chunk
-            try:
-                os.remove(filepath)
-            except:
-                pass
+        # ඩවුන්ලෝඩ් වුණ ෆයිල් එක පීසී එකට යැවීම (නම සහ Format එකත් එක්ක)
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename,
+            mimetype=mimetype
+        )
 
-        return Response(stream_with_context(generate()), content_type='application/octet-stream')
     except Exception as e:
         return str(e), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, threaded=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
