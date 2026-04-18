@@ -23,7 +23,11 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
-        ydl_opts = {'quiet': True, 'no_warnings': True}
+        ydl_opts = {
+            'quiet': True, 
+            'no_warnings': True,
+            'cookiefile': 'cookies.txt'  # යූටියුබ් බ්ලොක් එක කඩන කුකී ෆයිල් එක
+        }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return jsonify({
@@ -38,7 +42,7 @@ def fetch_video():
 def proxy_download():
     url = request.args.get('url')
     title = request.args.get('title', 'SocialConnect_Download')
-    ext = request.args.get('ext', 'mp4') # Ext එක frontend එකෙන් එනවා (mp4, m4a, mp3)
+    ext = request.args.get('ext', 'mp4') 
     quality = request.args.get('quality', 'premium')
 
     if not url:
@@ -49,7 +53,6 @@ def proxy_download():
     if not safe_title:
         safe_title = "SocialConnect_Audio_Video"
 
-    # අලුත් ලොජික් එක: outtmpl එකට %(ext)s දෙනවා
     base_path = os.path.join(DOWNLOAD_DIR, safe_title)
 
     try:
@@ -57,6 +60,7 @@ def proxy_download():
             'outtmpl': f"{base_path}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
+            'cookiefile': 'cookies.txt'  # මෙතනටත් කුකී ෆයිල් එක දුන්නා
         }
 
         if quality == 'audio':
@@ -64,8 +68,8 @@ def proxy_download():
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': ext, # mp3 ද m4a ද කියලා තීරණය කරන්නේ මෙතනින්
-                'preferredquality': '320', # 192 වෙනුවට 320 දැම්මා උපරිම කොලිටියට
+                'preferredcodec': ext, 
+                'preferredquality': '320', # උපරිම කොලිටිය
             }]
             mimetype = f'audio/{ext}'
             final_filepath = f"{base_path}.{ext}"
@@ -80,6 +84,7 @@ def proxy_download():
             download_filename = f"{safe_title}.mp4"
 
         else:
+            # Premium කොලිටිය
             ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best/bv*+ba*'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
