@@ -6,7 +6,6 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Temporary folder to store downloaded files
 DOWNLOAD_DIR = "downloads"
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
@@ -26,7 +25,7 @@ def fetch_video():
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
-            'cookiefile': 'cookies.txt'  # යූටියුබ් බ්ලොක් එක කඩන කුකී ෆයිල් එක
+            'cookiefile': 'cookies.txt'
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -48,7 +47,6 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
-    # අමුතු අකුරු අයින් කරලා ෆයිල් එකේ නම හදාගන්නවා
     safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
     if not safe_title:
         safe_title = "SocialConnect_Audio_Video"
@@ -60,32 +58,31 @@ def proxy_download():
             'outtmpl': f"{base_path}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
-            'cookiefile': 'cookies.txt'  # මෙතනටත් කුකී ෆයිල් එක දුන්නා
+            'cookiefile': 'cookies.txt'
         }
 
         if quality == 'audio':
-            # Music වලට අදාළ කොටස
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': ext, 
-                'preferredquality': '320', # උපරිම කොලිටිය
+                'preferredquality': '320', 
             }]
             mimetype = f'audio/{ext}'
             final_filepath = f"{base_path}.{ext}"
             download_filename = f"{safe_title}.{ext}"
 
         elif quality == 'normal':
-            # Normal කොලිටිය 480p වලට සීමා කළා
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best/bv+ba/b'
+            # 480p වලට වඩා අඩු හොඳම එක තෝරනවා
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
             download_filename = f"{safe_title}.mp4"
 
         else:
-            # Premium කොලිටිය
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best/bv*+ba*'
+            # Premium - Format එක Fix කරා ඕනෑම එකක් Mp4 වලට Merge වෙන්න
+            ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
