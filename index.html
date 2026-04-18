@@ -4,124 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230ea5e9'/><text x='50' y='75' font-size='70' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>S</text></svg>">
-    <title>SocialConnect | Universal Video Downloader</title>
+    <title>SocialConnect | 3D Universal Downloader</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #050810; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
-        
-        /* 3D Background & Orbs */
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'); background-size: cover; background-position: center; opacity: 0.15; z-index: -2; mix-blend-mode: overlay; }
-        .orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; animation: float 12s infinite alternate ease-in-out; }
-        .orb-1 { width: 400px; height: 400px; background: rgba(14, 165, 233, 0.4); top: -10%; left: -10%; }
-        .orb-2 { width: 500px; height: 500px; background: rgba(192, 38, 211, 0.3); bottom: -20%; right: -10%; animation-delay: -5s; }
-        .orb-3 { width: 300px; height: 300px; background: rgba(56, 189, 248, 0.2); top: 40%; left: 40%; animation-delay: -2s; }
-        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+        :root { --primary: #0ea5e9; --secondary: #c026d3; }
+        body { background-color: #030712; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
 
-        /* 3D Glass Panels */
-        .glass-wrapper { perspective: 1000px; }
+        /* --- VISIBLE 3D BACKGROUND --- */
+        .world-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3;
+            background: radial-gradient(circle at 50% 50%, #0a0f24 0%, #02040a 100%);
+            overflow: hidden;
+        }
+        .orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 12s infinite alternate ease-in-out; }
+        .orb-1 { width: 50vw; height: 50vw; background: rgba(14, 165, 233, 0.4); top: -20%; left: -10%; }
+        .orb-2 { width: 60vw; height: 60vw; background: rgba(192, 38, 211, 0.3); bottom: -30%; right: -15%; animation-delay: -4s; }
+        .orb-3 { width: 40vw; height: 40vw; background: rgba(56, 189, 248, 0.3); top: 30%; left: 30%; animation-delay: -8s; }
+        
+        @keyframes float { 
+            0% { transform: translate(0, 0) scale(1); } 
+            100% { transform: translate(60px, 60px) scale(1.15); } 
+        }
+
+        /* --- 3D SCROLL ANIMATIONS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* --- GLASSMORPHISM --- */
         .glass-panel { 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%); 
-            backdrop-filter: blur(25px) saturate(200%); 
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%); 
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.15); 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            transform-style: preserve-3d;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255,255,255,0.03);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
         .glass-panel:hover {
-            transform: translateY(-5px) rotateX(2deg) rotateY(-2deg);
-            box-shadow: 0 15px 40px 0 rgba(34, 211, 238, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px 0 rgba(34, 211, 238, 0.25), inset 0 0 20px rgba(255,255,255,0.08);
         }
 
-        /* 3D Elements inside Glass */
-        .glass-text { background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(56,189,248,0.3); transform: translateZ(20px); }
-        .btn-3d { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); transform: translateZ(0); }
-        .btn-3d:hover { transform: translateZ(15px) scale(1.02); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3); }
+        .glass-text { background: linear-gradient(135deg, #fff 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 25px rgba(56,189,248,0.4); }
+        .btn-3d { transition: all 0.3s ease; }
+        .btn-3d:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.4); }
 
-        .tab-btn.active { background-color: rgba(34, 211, 238, 0.15); border-bottom: 2px solid #22d3ee; color: #22d3ee; text-shadow: 0 0 10px rgba(34,211,238,0.5); }
-        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #38bdf8; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        @keyframes glowing { 0% { box-shadow: 0 0 5px; opacity: 0.7; transform: translateZ(10px); } 50% { box-shadow: 0 0 20px; opacity: 1; transform: translateZ(15px); } 100% { box-shadow: 0 0 5px; opacity: 0.7; transform: translateZ(10px); } }
         .glowing-logo { animation: glowing 3s infinite; border-radius: 50%; padding: 4px; border: 1px solid rgba(255,255,255,0.15); width: 60px; height: 60px; justify-content: center; backdrop-filter: blur(5px); }
-        .glow-tiktok { color: #00f2ea; border-color: rgba(0,242,234,0.4); box-shadow: 0 0 10px rgba(0,242,234,0.2); } 
-        .glow-pinterest { color: #bd081c; border-color: rgba(189,8,28,0.4); box-shadow: 0 0 10px rgba(189,8,28,0.2); }
-        .glow-youtube { color: #ff0000; border-color: rgba(255,0,0,0.4); box-shadow: 0 0 10px rgba(255,0,0,0.2); } 
-        .glow-facebook { color: #1877f2; border-color: rgba(24,119,242,0.4); box-shadow: 0 0 10px rgba(24,119,242,0.2); }
-        .glow-instagram { color: #c32aa3; border-color: rgba(195,42,163,0.4); box-shadow: 0 0 10px rgba(195,42,163,0.2); } 
-        .glow-any { color: #38bdf8; border-color: rgba(56,189,248,0.4); box-shadow: 0 0 10px rgba(56,189,248,0.2); }
+        @keyframes glowing { 0% { box-shadow: 0 0 5px rgba(255,255,255,0.2); } 50% { box-shadow: 0 0 20px rgba(255,255,255,0.5); } 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); } }
         
-        .policy-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); padding: 20px; overflow-y: auto; }
-        
-        /* Input Field 3D styling */
-        .input-3d { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
-        .input-3d:focus { border-color: #38bdf8; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(56,189,248,0.2); transform: translateZ(5px); }
+        .input-3d { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); transition: all 0.3s ease; box-shadow: inset 0 4px 15px rgba(0,0,0,0.8); }
+        .input-3d:focus { border-color: #38bdf8; box-shadow: inset 0 4px 15px rgba(0,0,0,0.8), 0 0 25px rgba(56,189,248,0.3); outline: none; }
     </style>
 </head>
 <body class="text-white pt-16 md:pt-20">
 
-    <div class="bg-overlay"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+    <div class="world-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
     <nav class="absolute top-0 left-0 w-full p-4 md:p-6 lg:px-12 flex justify-center md:justify-between items-center z-30">
-        <div class="text-2xl md:text-3xl font-bold tracking-wider select-none text-center w-full md:w-auto" style="transform: translateZ(10px);">Social<span class="text-cyan-400">Connect</span></div>
-        <div class="hidden md:flex gap-8 text-sm font-medium text-slate-300" style="transform: translateZ(5px);">
-            <a href="#" class="hover:text-cyan-400 transition-colors">Home</a>
-            <a href="#seo-content" class="hover:text-cyan-400 transition-colors">Supported Sites</a>
-        </div>
+        <div class="text-2xl md:text-3xl font-bold tracking-wider select-none text-center w-full md:w-auto">Social<span class="text-cyan-400">Connect</span></div>
     </nav>
 
-    <div class="min-h-[75vh] flex flex-col items-center justify-center px-4 mt-8 md:mt-0 glass-wrapper">
+    <div class="min-h-[75vh] flex flex-col items-center justify-center px-4 mt-8 md:mt-0 reveal">
         <div class="glass-panel rounded-3xl p-6 md:p-12 max-w-3xl w-full text-center z-10">
             <h1 class="text-4xl md:text-5xl lg:text-7xl font-black mb-4 glass-text uppercase tracking-tight">Universal <br/>Video Downloader</h1>
-            <p class="text-slate-300 text-sm md:text-lg mb-10 font-light" style="transform: translateZ(10px);">Download <strong class="text-white">TikTok without watermark</strong>, HD Pinterest videos, and YouTube MP4/MP3 instantly.</p>
+            <p class="text-slate-300 text-sm md:text-lg mb-10 font-light">Download <strong class="text-white">TikTok without watermark</strong>, HD Pinterest videos, and YouTube MP4/MP3 instantly.</p>
             
-            <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-12 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-tiktok"><i class="fa-brands fa-tiktok text-2xl"></i></div>
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-pinterest"><i class="fa-brands fa-pinterest text-2xl"></i></div>
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-youtube"><i class="fa-brands fa-youtube text-2xl"></i></div>
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-facebook"><i class="fa-brands fa-facebook text-2xl"></i></div>
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-instagram"><i class="fa-brands fa-instagram text-2xl"></i></div>
-                <div class="flex flex-col items-center gap-1 glowing-logo glow-any"><i class="fa-solid fa-link text-2xl"></i></div>
+            <div class="flex flex-col sm:flex-row gap-4 mb-6 relative">
+                <input type="text" id="videoUrl" placeholder="Paste video link here..." class="input-3d flex-1 px-6 py-4 rounded-xl text-white outline-none w-full placeholder-slate-400 text-lg">
+                <button id="connectBtn" class="btn-3d px-10 py-4 rounded-xl font-black bg-cyan-600 border border-cyan-400/50 w-full sm:w-auto transition-all text-white tracking-widest text-lg hover:bg-cyan-500">CONNECT</button>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-4 mb-6 relative" style="transform: translateZ(15px);">
-                <input type="text" id="videoUrl" placeholder="Paste video link here..." class="input-3d flex-1 px-6 py-4 rounded-xl text-white outline-none w-full placeholder-slate-500 text-lg">
-                <button id="connectBtn" class="btn-3d px-10 py-4 rounded-xl font-black bg-cyan-600 border border-cyan-400/50 w-full sm:w-auto transition-all text-white tracking-widest text-lg shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:bg-cyan-500">CONNECT</button>
-            </div>
-
-            <div id="resultContainer" class="hidden opacity-0 transition-all duration-500 transform scale-95" style="transform: translateZ(10px);">
+            <div id="resultContainer" class="hidden opacity-0 transition-all duration-500 transform scale-95 mt-8">
                 <div class="flex gap-4 mb-6 border-b border-white/10 justify-center">
-                    <button id="tabVideo" class="tab-btn active pb-3 px-4 font-bold text-sm tracking-widest uppercase transition-colors" onclick="switchTab('video')"><i class="fa-solid fa-video mr-2"></i>Video</button>
-                    <button id="tabAudio" class="tab-btn pb-3 px-4 font-bold text-sm tracking-widest uppercase text-slate-400 hover:text-white transition-colors" onclick="switchTab('audio')"><i class="fa-solid fa-music mr-2"></i>Audio</button>
+                    <button id="tabVideo" class="active pb-3 px-4 font-bold text-sm text-cyan-400 border-b-2 border-cyan-400 uppercase" onclick="switchTab('video')"><i class="fa-solid fa-video mr-2"></i>Video</button>
+                    <button id="tabAudio" class="pb-3 px-4 font-bold text-sm text-slate-400 hover:text-white uppercase" onclick="switchTab('audio')"><i class="fa-solid fa-music mr-2"></i>Audio</button>
                 </div>
 
-                <div class="bg-black/30 rounded-2xl p-4 md:p-6 flex flex-col sm:flex-row gap-6 text-left border border-white/10 shadow-inner">
+                <div class="bg-black/40 rounded-2xl p-4 md:p-6 flex flex-col sm:flex-row gap-6 text-left border border-white/10 shadow-inner">
                     <img id="resThumbnail" src="" class="w-full sm:w-1/3 rounded-xl object-cover shadow-lg border border-white/10">
                     <div class="flex-1 w-full flex flex-col justify-center">
                         <h3 id="resTitle" class="text-sm md:text-base font-bold mb-5 line-clamp-2 text-white"></h3>
                         
                         <div id="sectionVideo" class="w-full">
-                            <p class="text-[10px] text-cyan-400 font-bold mb-3 uppercase tracking-wider">Select Download Type</p>
                             <div class="flex flex-col gap-3">
                                 <button onclick="handleVideoDownload('normal', this)" class="btn-3d w-full py-4 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 flex justify-between px-6 items-center">
                                     <span class="btn-text">Download Video (Normal)</span>
                                     <span class="text-slate-500 font-normal">Fast DL</span>
                                 </button>
-                                <button onclick="handleVideoDownload('premium', this)" class="btn-3d w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/50 rounded-xl text-xs font-bold flex justify-between px-6 items-center shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                                <button onclick="handleVideoDownload('premium', this)" class="btn-3d w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/50 rounded-xl text-xs font-bold flex justify-between px-6 items-center">
                                     <span class="btn-text text-white">Download Video High Quality</span>
-                                    <span class="bg-yellow-400 text-black px-2 py-1 rounded text-[10px] font-black animate-bounce shadow-[0_0_10px_rgba(250,204,21,0.5)]">AD</span>
+                                    <span class="bg-yellow-400 text-black px-2 py-1 rounded text-[10px] font-black animate-bounce">AD</span>
                                 </button>
                             </div>
                         </div>
 
                         <div id="sectionAudio" class="hidden w-full">
-                            <p class="text-[10px] text-purple-400 font-bold mb-3 uppercase tracking-wider">Select Audio Quality</p>
                             <div class="grid grid-cols-1 gap-3">
-                                <button onclick="handleAudioDownload('m4a', this)" class="btn-3d py-4 bg-purple-600/30 border border-purple-400/50 rounded-xl text-xs font-bold hover:bg-purple-600/50 text-purple-100 w-full flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.3)]"><span class="btn-text">Download Audio (.m4a)</span></button>
+                                <button onclick="handleAudioDownload('m4a', this)" class="btn-3d py-4 bg-purple-600/30 border border-purple-400/50 rounded-xl text-xs font-bold hover:bg-purple-600/50 text-purple-100 w-full flex justify-center items-center gap-2"><span class="btn-text">Download Audio (.m4a)</span></button>
                             </div>
                         </div>
                     </div>
@@ -130,69 +120,54 @@
         </div>
     </div>
 
-    <div id="seo-content" class="max-w-6xl mx-auto px-6 py-24 mt-10 relative z-10 glass-wrapper">
-        <div class="text-center mb-16">
+    <div id="seo-content" class="max-w-7xl mx-auto px-6 py-24 mt-10 relative z-10">
+        <div class="text-center mb-16 reveal">
             <h2 class="text-3xl md:text-5xl font-black text-white mb-6">The Ultimate Downloader <br/> <span class="text-cyan-400">For Every Platform</span></h2>
             <p class="text-slate-400 max-w-3xl mx-auto text-lg">Why use multiple websites when you have one powerful, fast, and 100% free tool? Perfectly optimized for your mobile device and editing workflow.</p>
         </div>
+        
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#00f2ea] mb-4"><i class="fa-brands fa-tiktok mr-3 text-2xl"></i>TikTok</h3><p class="text-sm text-slate-400 leading-relaxed">Download TikTok videos <strong class="text-white">without watermark</strong> perfectly.</p></div>
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#bd081c] mb-4"><i class="fa-brands fa-pinterest mr-3 text-2xl"></i>Pinterest</h3><p class="text-sm text-slate-400 leading-relaxed">Extract aesthetic videos in <strong class="text-white">1080p HD quality</strong>.</p></div>
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#ff0000] mb-4"><i class="fa-brands fa-youtube mr-3 text-2xl"></i>YouTube</h3><p class="text-sm text-slate-400 leading-relaxed">Easily convert and save <strong class="text-white">MP4 & MP3</strong> instantly.</p></div>
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#1877f2] mb-4"><i class="fa-brands fa-facebook mr-3 text-2xl"></i>Facebook</h3><p class="text-sm text-slate-400 leading-relaxed">Save public and private videos directly.</p></div>
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#c32aa3] mb-4"><i class="fa-brands fa-instagram mr-3 text-2xl"></i>Instagram</h3><p class="text-sm text-slate-400 leading-relaxed">Download <strong class="text-white">Reels & IGTV</strong> directly to gallery.</p></div>
-            <div class="glass-panel p-8 rounded-3xl"><h3 class="text-xl font-bold text-[#38bdf8] mb-4"><i class="fa-solid fa-link mr-3 text-2xl"></i>1000+ Sites</h3><p class="text-sm text-slate-400 leading-relaxed">Our universal engine supports almost anything.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#00f2ea] mb-4"><i class="fa-brands fa-tiktok mr-3 text-2xl"></i>TikTok</h3><p class="text-sm text-slate-400">Download TikTok videos <strong class="text-white">without watermark</strong> perfectly.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#bd081c] mb-4"><i class="fa-brands fa-pinterest mr-3 text-2xl"></i>Pinterest</h3><p class="text-sm text-slate-400">Extract aesthetic videos in <strong class="text-white">1080p HD quality</strong>.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#ff0000] mb-4"><i class="fa-brands fa-youtube mr-3 text-2xl"></i>YouTube</h3><p class="text-sm text-slate-400">Easily convert and save <strong class="text-white">MP4 & MP3</strong> instantly.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#1877f2] mb-4"><i class="fa-brands fa-facebook mr-3 text-2xl"></i>Facebook</h3><p class="text-sm text-slate-400">Save public and private videos directly to gallery.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#c32aa3] mb-4"><i class="fa-brands fa-instagram mr-3 text-2xl"></i>Instagram</h3><p class="text-sm text-slate-400">Download <strong class="text-white">Reels & IGTV</strong> easily.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-gray-300 mb-4"><i class="fa-brands fa-x-twitter mr-3 text-2xl"></i>Twitter (X)</h3><p class="text-sm text-slate-400">Download <strong class="text-white font-semibold">Twitter videos and GIFs</strong> instantly.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#fffc00] mb-4"><i class="fa-brands fa-snapchat mr-3 text-black bg-[#fffc00] rounded-full p-1"></i>Snapchat</h3><p class="text-sm text-slate-400">Save <strong class="text-white font-semibold">Snapchat Spotlight videos</strong>.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#0a66c2] mb-4"><i class="fa-brands fa-linkedin mr-3 text-2xl"></i>LinkedIn</h3><p class="text-sm text-slate-400">Download professional <strong class="text-white font-semibold">LinkedIn videos</strong>.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#ff4500] mb-4"><i class="fa-brands fa-reddit mr-3 text-2xl"></i>Reddit</h3><p class="text-sm text-slate-400">Easily extract and save <strong class="text-white font-semibold">Reddit videos</strong>.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#9146ff] mb-4"><i class="fa-brands fa-twitch mr-3 text-2xl"></i>Twitch</h3><p class="text-sm text-slate-400">Save your favorite gaming clips.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#1ab7ea] mb-4"><i class="fa-brands fa-vimeo mr-3 text-2xl"></i>Vimeo</h3><p class="text-sm text-slate-400">Download <strong class="text-white font-semibold">Vimeo PRO and HD videos</strong>.</p></div>
+            <div class="glass-panel p-8 rounded-3xl reveal"><h3 class="text-xl font-bold text-[#38bdf8] mb-4"><i class="fa-solid fa-link mr-3 text-2xl"></i>1000+ Sites</h3><p class="text-sm text-slate-400">Our universal engine supports almost anything.</p></div>
         </div>
     </div>
 
-    <footer class="mt-10 py-12 text-center border-t border-white/10 relative z-10 bg-black/40 backdrop-blur-md">
-        <p class="text-slate-500 text-sm mb-6">© 2026 SocialConnect. All rights reserved.</p>
-        <div class="flex justify-center gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
-            <button onclick="toggleModal('termsModal')" class="hover:text-cyan-400 transition-colors">Terms of Service</button>
-            <button onclick="toggleModal('privacyModal')" class="hover:text-cyan-400 transition-colors">Privacy Policy</button>
-        </div>
-    </footer>
-
-    <div id="rewardAdModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl transition-opacity">
+    <div id="rewardAdModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl">
         <div class="glass-panel p-10 rounded-3xl text-center max-w-sm w-full">
             <h3 class="text-cyan-400 font-black mb-6 text-xl tracking-wide">Unlocking High-Quality...</h3>
-            <div class="w-full aspect-video bg-black/50 rounded-xl mb-6 flex items-center justify-center text-cyan-500 border border-cyan-500/30 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-                <i class="fa-solid fa-bolt text-4xl animate-pulse"></i>
-            </div>
             <p id="adTimer" class="text-7xl font-black text-white text-shadow-lg">30</p>
             <p class="text-xs text-slate-400 mt-6 uppercase tracking-widest font-bold">Please wait for your file</p>
         </div>
     </div>
 
-    <div id="termsModal" class="policy-modal">
-        <div class="glass-panel max-w-2xl mx-auto my-10 p-10 rounded-3xl relative">
-            <button onclick="toggleModal('termsModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white transition-transform hover:rotate-90"><i class="fa-solid fa-xmark text-3xl"></i></button>
-            <h2 class="text-3xl font-black text-cyan-400 mb-8">Terms of Service</h2>
-            <div class="text-slate-300 text-sm leading-relaxed space-y-6 text-left">
-                <p>1. **Acceptance:** By using SocialConnect, you agree to these terms.</p>
-                <p>2. **Usage:** This tool is for personal use only. Users are responsible for complying with the copyright terms of the original content platforms.</p>
-                <p>3. **Disclaimer:** SocialConnect does not host any copyrighted content. We only provide a technical service to access public video links.</p>
-                <p>4. **Prohibition:** You may not use this tool to infringe on intellectual property rights or for commercial redistribution.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="privacyModal" class="policy-modal">
-        <div class="glass-panel max-w-2xl mx-auto my-10 p-10 rounded-3xl relative">
-            <button onclick="toggleModal('privacyModal')" class="absolute top-6 right-6 text-slate-400 hover:text-white transition-transform hover:rotate-90"><i class="fa-solid fa-xmark text-3xl"></i></button>
-            <h2 class="text-3xl font-black text-purple-400 mb-8">Privacy Policy</h2>
-            <div class="text-slate-300 text-sm leading-relaxed space-y-6 text-left">
-                <p>1. **Data Collection:** We do NOT store your personal data or your download history. All processing happens in real-time.</p>
-                <p>2. **Cookies:** We may use cookies to improve your browsing experience and for ad personalization.</p>
-                <p>3. **Third Parties:** We use third-party advertising companies to serve ads.</p>
-                <p>4. **Security:** We prioritize the safety of our users and do not share any technical logs with third parties.</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let currentVideoData = null;
+        // --- SCROLL ANIMATION JS ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 50; // Triggers earlier
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        setTimeout(reveal, 100); 
 
+        // --- BACKEND LOGIC (COMPLETELY UNCHANGED) ---
+        let currentVideoData = null;
         const connectBtn = document.getElementById('connectBtn');
         const videoUrlInput = document.getElementById('videoUrl');
         const resultContainer = document.getElementById('resultContainer');
@@ -201,7 +176,7 @@
             const url = videoUrlInput.value.trim();
             if (!url) return;
             
-            connectBtn.innerHTML = '<div class="loader inline-block align-middle mr-2"></div> FETCHING...';
+            connectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> FETCHING...';
             resultContainer.classList.add('hidden', 'scale-95', 'opacity-0');
 
             try {
@@ -212,7 +187,6 @@
                 });
                 
                 currentVideoData = await res.json();
-                
                 if(currentVideoData.error) throw new Error(currentVideoData.error);
                 
                 document.getElementById('resThumbnail').src = currentVideoData.thumbnail;
@@ -233,12 +207,20 @@
         });
 
         function switchTab(tab) {
-            document.getElementById('tabVideo').classList.toggle('active', tab === 'video');
-            document.getElementById('tabAudio').classList.toggle('active', tab === 'audio');
-            document.getElementById('tabVideo').classList.toggle('text-slate-400', tab !== 'video');
-            document.getElementById('tabAudio').classList.toggle('text-slate-400', tab !== 'audio');
-            document.getElementById('sectionVideo').style.display = tab === 'video' ? 'block' : 'none';
-            document.getElementById('sectionAudio').style.display = tab === 'audio' ? 'block' : 'none';
+            const tVid = document.getElementById('tabVideo');
+            const tAud = document.getElementById('tabAudio');
+            
+            if(tab === 'video') {
+                tVid.className = 'active pb-3 px-4 font-bold text-sm text-cyan-400 border-b-2 border-cyan-400 uppercase';
+                tAud.className = 'pb-3 px-4 font-bold text-sm text-slate-400 hover:text-white uppercase';
+                document.getElementById('sectionVideo').style.display = 'block';
+                document.getElementById('sectionAudio').style.display = 'none';
+            } else {
+                tAud.className = 'active pb-3 px-4 font-bold text-sm text-cyan-400 border-b-2 border-cyan-400 uppercase';
+                tVid.className = 'pb-3 px-4 font-bold text-sm text-slate-400 hover:text-white uppercase';
+                document.getElementById('sectionVideo').style.display = 'none';
+                document.getElementById('sectionAudio').style.display = 'block';
+            }
         }
 
         function forceDownloadViaBackend(originalUrl, title, ext, quality = 'premium') {
@@ -255,7 +237,6 @@
             const textSpan = buttonElement.querySelector('.btn-text');
             textSpan.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Merging File...`;
             buttonElement.classList.add('opacity-70', 'cursor-wait');
-            
             setTimeout(() => {
                 textSpan.innerHTML = originalText;
                 buttonElement.classList.remove('opacity-70', 'cursor-wait');
@@ -270,20 +251,14 @@
             if (type === 'normal') {
                 window.open('https://www.google.com/search?q=Advertisement', '_blank');
                 setButtonDownloadingState(btnElement, 'Download Video (Normal)');
-                
-                // අලුත් වෙනස: Normal එබුවත් යන්නේ Premium කොලිටියමයි!
                 forceDownloadViaBackend(originalUrl, title, 'mp4', 'premium'); 
-
             } else if (type === 'premium') {
                 let timer = 30; 
                 const modal = document.getElementById('rewardAdModal');
                 const timerEl = document.getElementById('adTimer');
-                
                 modal.classList.remove('hidden'); 
                 timerEl.innerText = timer;
-                
                 if(window.adInterval) clearInterval(window.adInterval);
-
                 window.adInterval = setInterval(() => {
                     timer--; 
                     timerEl.innerText = timer;
@@ -304,11 +279,6 @@
             window.open('https://www.google.com/search?q=Pop_under_Ad', '_blank');
             setButtonDownloadingState(btnElement, `Download Audio (.${ext})`);
             forceDownloadViaBackend(originalUrl, title, ext, 'audio');
-        }
-
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
         }
     </script>
 </body>
