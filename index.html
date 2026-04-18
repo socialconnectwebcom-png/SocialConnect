@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230ea5e9'/><text x='50' y='75' font-size='70' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>S</text></svg>">
-
     <title>SocialConnect | Universal Video Downloader</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -139,7 +137,7 @@
             <h2 class="text-2xl font-bold text-cyan-400 mb-6">Terms of Service</h2>
             <div class="text-slate-300 text-sm leading-relaxed space-y-4 text-left">
                 <p>1. **Acceptance:** By using SocialConnect, you agree to these terms.</p>
-                <p>2. **Usage:** This tool is for personal use only. Users are responsible for complying with the copyright terms of the original content platforms (YouTube, TikTok, etc.).</p>
+                <p>2. **Usage:** This tool is for personal use only. Users are responsible for complying with the copyright terms of the original content platforms.</p>
                 <p>3. **Disclaimer:** SocialConnect does not host any copyrighted content. We only provide a technical service to access public video links.</p>
                 <p>4. **Prohibition:** You may not use this tool to infringe on intellectual property rights or for commercial redistribution.</p>
             </div>
@@ -153,7 +151,7 @@
             <div class="text-slate-300 text-sm leading-relaxed space-y-4 text-left">
                 <p>1. **Data Collection:** We do NOT store your personal data or your download history. All processing happens in real-time.</p>
                 <p>2. **Cookies:** We may use cookies to improve your browsing experience and for ad personalization.</p>
-                <p>3. **Third Parties:** We use third-party advertising companies to serve ads. These companies may use information about your visits to provide relevant advertisements.</p>
+                <p>3. **Third Parties:** We use third-party advertising companies to serve ads.</p>
                 <p>4. **Security:** We prioritize the safety of our users and do not share any technical logs with third parties.</p>
             </div>
         </div>
@@ -174,11 +172,15 @@
             resultContainer.classList.add('hidden', 'opacity-0');
 
             try {
-                const res = await fetch('http://127.0.0.1:5000/api/get-video', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                // Backend API Request - Fixed URL
+                const res = await fetch('https://socialconnect-production-90ba.up.railway.app/fetch-video', {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({url})
                 });
+                
                 currentVideoData = await res.json();
+                
                 if(currentVideoData.error) throw new Error(currentVideoData.error);
                 
                 document.getElementById('resThumbnail').src = currentVideoData.thumbnail;
@@ -188,8 +190,11 @@
                 setTimeout(() => resultContainer.classList.remove('opacity-0'), 50);
                 switchTab('video');
 
-            } catch(e) { alert(e.message || "Error connecting to server!"); } 
-            finally { connectBtn.innerHTML = 'CONNECT'; }
+            } catch(e) { 
+                alert(e.message || "Error connecting to server!"); 
+            } finally { 
+                connectBtn.innerHTML = 'CONNECT'; 
+            }
         });
 
         function switchTab(tab) {
@@ -202,7 +207,8 @@
         }
 
         function forceDownloadViaBackend(originalUrl, title, ext, quality = 'premium') {
-            const proxyUrl = `http://127.0.0.1:5000/api/proxy-download?url=${encodeURIComponent(originalUrl)}&title=${encodeURIComponent(title)}&ext=${ext}&quality=${quality}`;
+            // Backend Download Request - Fixed URL
+            const proxyUrl = `https://socialconnect-production-90ba.up.railway.app/download?url=${encodeURIComponent(originalUrl)}&title=${encodeURIComponent(title)}&ext=${ext}&quality=${quality}`;
             const link = document.createElement('a');
             link.href = proxyUrl; 
             link.setAttribute('download', `${title}.${ext}`);
@@ -223,8 +229,9 @@
         }
 
         function handleVideoDownload(type, btnElement) {
+            if (!currentVideoData) return;
             const originalUrl = currentVideoData.original_url; 
-            const title = currentVideoData.title;
+            const title = currentVideoData.title || 'video';
 
             if (type === 'normal') {
                 window.open('https://www.google.com/search?q=Advertisement', '_blank');
@@ -255,14 +262,14 @@
         }
 
         function handleAudioDownload(ext, btnElement) {
+            if (!currentVideoData) return;
             const originalUrl = currentVideoData.original_url;
-            const title = currentVideoData.title;
+            const title = currentVideoData.title || 'audio';
             window.open('https://www.google.com/search?q=Pop_under_Ad', '_blank');
             setButtonDownloadingState(btnElement, `Download Audio (.${ext})`);
             forceDownloadViaBackend(originalUrl, title, ext, 'audio');
         }
 
-        // Modal toggle function for Terms and Privacy
         function toggleModal(id) {
             const modal = document.getElementById(id);
             modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
