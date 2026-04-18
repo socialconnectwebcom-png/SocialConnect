@@ -21,6 +21,9 @@
         .glow-youtube { color: #ff0000; border-color: rgba(255,0,0,0.3); } .glow-facebook { color: #1877f2; border-color: rgba(24,119,242,0.3); }
         .glow-instagram { color: #c32aa3; border-color: rgba(195,42,163,0.3); } .glow-any { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
         .policy-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-blur: 10px; padding: 20px; overflow-y: auto; }
+        
+        /* අලුත් Ad Styles */
+        .ad-placeholder { border: 2px dashed rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.4); text-align: center; }
     </style>
 </head>
 <body class="text-white overflow-x-hidden pt-16 md:pt-20">
@@ -35,8 +38,15 @@
         </div>
     </nav>
 
-    <div class="min-h-[75vh] flex flex-col items-center justify-center px-4 mt-8 md:mt-0">
-        <div class="glass-panel rounded-3xl p-6 md:p-12 max-w-3xl w-full text-center z-10 shadow-2xl">
+    <div class="min-h-[75vh] flex flex-col xl:flex-row items-center xl:items-start justify-center gap-8 px-4 mt-8 md:mt-12 w-full max-w-[1400px] mx-auto z-10 relative">
+        
+        <div class="hidden xl:flex ad-placeholder rounded-2xl w-[160px] h-[600px] sticky top-24 shadow-lg glass-panel">
+            <i class="fa-solid fa-rectangle-ad text-4xl mb-3 text-cyan-500/50"></i>
+            <p class="text-sm font-bold uppercase tracking-widest">Left Ad Space</p>
+            <p class="text-[10px] mt-2 opacity-50">160x600 px</p>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-6 md:p-12 w-full max-w-3xl text-center shadow-2xl flex-1">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 glass-text">Universal Video Downloader</h1>
             <p class="text-slate-300 text-sm md:text-lg mb-8 font-light">Download <strong class="text-white">TikTok without watermark</strong>, HD Pinterest videos, and YouTube MP4/MP3 instantly.</p>
             
@@ -88,7 +98,21 @@
                     </div>
                 </div>
             </div>
+
+            <div class="block xl:hidden w-full h-[100px] mt-8 ad-placeholder rounded-xl glass-panel">
+                <i class="fa-solid fa-rectangle-ad text-3xl mb-1 text-cyan-500/50"></i>
+                <p class="text-xs font-bold uppercase tracking-widest">Mobile Banner Ad</p>
+                <p class="text-[9px] mt-1 opacity-50">320x50 or 300x100 px</p>
+            </div>
+
         </div>
+
+        <div class="hidden xl:flex ad-placeholder rounded-2xl w-[160px] h-[600px] sticky top-24 shadow-lg glass-panel">
+            <i class="fa-solid fa-rectangle-ad text-4xl mb-3 text-cyan-500/50"></i>
+            <p class="text-sm font-bold uppercase tracking-widest">Right Ad Space</p>
+            <p class="text-[10px] mt-2 opacity-50">160x600 px</p>
+        </div>
+
     </div>
 
     <div id="seo-content" class="max-w-6xl mx-auto px-6 py-20 border-t border-white/5 mt-10 bg-black/20 relative z-10">
@@ -172,7 +196,7 @@
             resultContainer.classList.add('hidden', 'opacity-0');
 
             try {
-                // Backend API Request - Fixed URL
+                // අලුත් Railway සර්වර් ලින්ක් එක
                 const res = await fetch('https://socialconnect-production-90ba.up.railway.app/fetch-video', {
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'},
@@ -207,7 +231,7 @@
         }
 
         function forceDownloadViaBackend(originalUrl, title, ext, quality = 'premium') {
-            // Backend Download Request - Fixed URL
+            // අලුත් Railway සර්වර් ලින්ක් එක
             const proxyUrl = `https://socialconnect-production-90ba.up.railway.app/download?url=${encodeURIComponent(originalUrl)}&title=${encodeURIComponent(title)}&ext=${ext}&quality=${quality}`;
             const link = document.createElement('a');
             link.href = proxyUrl; 
