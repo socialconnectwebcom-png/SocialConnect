@@ -62,6 +62,7 @@ def proxy_download():
 
     if ext == 'mp4':
         ydl_opts['merge_output_format'] = 'mp4' 
+        # ඕනෑම වීඩියෝ එකක තියෙන හොඳම කොලිටිය ඔටෝම තෝරාගන්න විදිහට හැදුවා
         if quality == 'normal':
             ydl_opts['format'] = 'best[height<=720]/best'
         else:
