@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import yt_dlp
 import os
+import urllib.request
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -13,6 +15,24 @@ if not os.path.exists(DOWNLOAD_DIR):
 @app.route('/')
 def home():
     return "SocialConnect Server is Running!"
+
+# 🚀 අලුත් Bridge එක (Cobalt API එකට සර්වර් එක හරහා කතා කරන්න)
+@app.route('/cobalt-proxy', methods=['POST'])
+def cobalt_proxy():
+    data = request.json
+    try:
+        req = urllib.request.Request("https://api.cobalt.tools/api/json", method="POST")
+        req.add_header('Accept', 'application/json')
+        req.add_header('Content-Type', 'application/json')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')
+
+        jsondata = json.dumps(data).encode('utf-8')
+        
+        with urllib.request.urlopen(req, data=jsondata) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            return jsonify(res_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/fetch-video', methods=['POST'])
 def fetch_video():
@@ -26,7 +46,8 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'cookiefile': 'cookies.txt',
-            'noplaylist': True
+            'noplaylist': True,
+            'format': 'best'
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -74,17 +95,8 @@ def proxy_download():
             final_filepath = f"{base_path}.{ext}"
             download_filename = f"{safe_title}.{ext}"
 
-        elif quality == 'normal':
-            # Pinterest / TikTok වගේ ඒවට Support කරන විදිහට හැදුවා (/best/b එකතු කළා)
-            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/b'
-            ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
-            final_filepath = f"{base_path}.mp4"
-            download_filename = f"{safe_title}.mp4"
-
         else:
-            # Pinterest / TikTok වල Premium එකට Support කරන විදිහට හැදුවා (/best/b එකතු කළා)
-            ydl_opts['format'] = 'bestvideo+bestaudio/best/b'
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
@@ -99,15 +111,10 @@ def proxy_download():
                     final_filepath = os.path.join(DOWNLOAD_DIR, f)
                     break
 
-        return send_file(
-            final_filepath,
-            as_attachment=True,
-            download_name=download_filename,
-            mimetype=mimetype
-        )
+        return send_file(final_filepath, as_attachment=True, download_name=download_filename, mimetype=mimetype)
 
     except Exception as e:
         return str(e), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
