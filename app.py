@@ -22,10 +22,12 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
+        # Shorts වල format error එන එක නවත්තන්න 'b' දැම්මා
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
             'cookiefile': 'cookies.txt',
+            'format': 'b',
             'noplaylist': True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -42,6 +44,7 @@ def fetch_video():
 def proxy_download():
     url = request.args.get('url')
     title = request.args.get('title', 'SocialConnect_Download')
+    ext = request.args.get('ext', 'mp4') 
     quality = request.args.get('quality', 'premium')
 
     if not url:
@@ -52,9 +55,6 @@ def proxy_download():
         safe_title = "SocialConnect_Audio_Video"
 
     base_path = os.path.join(DOWNLOAD_DIR, safe_title)
-    
-    # ඩිෆෝල්ට් විදිහට බලාපොරොත්තු වෙන්නේ mp4
-    expected_ext = 'mp4'
 
     try:
         ydl_opts = {
@@ -66,41 +66,46 @@ def proxy_download():
         }
 
         if quality == 'audio':
-            # Audio වලදී අනිවාර්යයෙන්ම MP3 ෆයිල් එකක් විතරක් ඉල්ලනවා
-            expected_ext = 'mp3'
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '320',
+                'preferredcodec': ext, 
+                'preferredquality': '192',
             }]
-            
+            mimetype = f'audio/{ext}'
+            final_filepath = f"{base_path}.{ext}"
+            download_filename = f"{safe_title}.{ext}"
+
         elif quality == 'normal':
-            # 480p හෝ ඊට අඩු එකක්ම විතරක් ගන්නවා. නැත්නම් තියෙන අඩුම එක (worst) ගන්නවා. කවදාවත් 1080p වලට යන්නේ නෑ.
-            expected_ext = 'mp4'
-            ydl_opts['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480]/worst'
+            ydl_opts['format'] = 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
-            
+            mimetype = 'video/mp4'
+            final_filepath = f"{base_path}.mp4"
+            download_filename = f"{safe_title}.mp4"
+
         else:
-            # Premium
-            expected_ext = 'mp4'
-            ydl_opts['format'] = 'bestvideo[vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
+            mimetype = 'video/mp4'
+            final_filepath = f"{base_path}.mp4"
+            download_filename = f"{safe_title}.mp4"
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # මෙතන තමයි ලොකුම වෙනස: පරණ ෆයිල් ගන්නේ නැතුව, අපි ඉල්ලපු Extention එක (.mp3 හෝ .mp4) තියෙන ෆයිල් එක විතරක් හරියටම තෝරගන්නවා.
-        final_file = None
-        for f in os.listdir(DOWNLOAD_DIR):
-            if safe_title in f and f.endswith(f'.{expected_ext}'):
-                final_file = os.path.join(DOWNLOAD_DIR, f)
-                break
+        # Download වුණ file එක හරියටම අල්ලගන්න Backup logic එක
+        if not os.path.exists(final_filepath):
+            for f in os.listdir(DOWNLOAD_DIR):
+                if safe_title in f and f.endswith(ext if quality == 'audio' else 'mp4'):
+                    final_filepath = os.path.join(DOWNLOAD_DIR, f)
+                    break
 
-        if final_file:
-            return send_file(final_file, as_attachment=True)
-        else:
-            return f"Error: Could not find the generated .{expected_ext} file.", 500
+        return send_file(
+            final_filepath,
+            as_attachment=True,
+            download_name=download_filename,
+            mimetype=mimetype
+        )
 
     except Exception as e:
         return str(e), 500
