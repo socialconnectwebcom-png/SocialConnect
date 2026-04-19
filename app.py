@@ -6,7 +6,6 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ඩවුන්ලෝඩ් ෆෝල්ඩරය හැදීම
 DOWNLOAD_DIR = "downloads"
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
@@ -27,7 +26,7 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'noplaylist': True,
-            # 🚀 Hacker Trick: Android client එකක් විදිහට පෙනී සිටීම (No Cookies needed)
+            'cookiefile': 'cookies.txt', # 🚀 කුකීස් ෆයිල් එක ආයෙත් එකතු කළා
             'extractor_args': {'youtube': ['player_client=android']}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -59,6 +58,7 @@ def proxy_download():
             'quiet': True,
             'no_warnings': True,
             'noplaylist': True,
+            'cookiefile': 'cookies.txt', # 🚀 මෙතනටත් කුකීස් එකතු කළා
             'extractor_args': {'youtube': ['player_client=android']}
         }
 
@@ -73,14 +73,12 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 අඩු කොලිටිය (480p වලට සීමා කිරීම)
             ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 උපරිම කොලිටිය (1080p / 4K / Best available)
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
@@ -91,11 +89,9 @@ def proxy_download():
 
         final_path = f"{DOWNLOAD_DIR}/{safe_title}.{ext}"
         
-        # File එක තියෙනවද කියලා check කරලා යැවීම
         if os.path.exists(final_path):
             return send_file(final_path, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
         else:
-            # Backup: extension එක වෙනස් වෙලා තිබුණොත් ඒක අල්ලගන්නවා
             for f in os.listdir(DOWNLOAD_DIR):
                 if safe_title in f:
                     return send_file(os.path.join(DOWNLOAD_DIR, f), as_attachment=True)
@@ -105,5 +101,4 @@ def proxy_download():
         return str(e), 500
 
 if __name__ == '__main__':
-    # Railway එකේ PORT එකට ගැලපෙන්න dynamic විදිහට port එක ගනියි
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
