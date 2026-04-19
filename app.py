@@ -66,16 +66,14 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality: 480p හෝ ඊට අඩු එකක්ම බල කරනවා
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best'
-            ydl_opts['format_sort'] = ['res:480', 'ext:mp4:m4a']
+            # 📉 Normal Quality: 480p hudukuttade, illavendare kanishta (worst) quality padeyuttade
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/worst'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality: Absolute Highest Quality (4K/1080p)
-            # කිසිම සීමාවක් නෑ, තියෙන උපරිම කොලිටිය අරන් MP4 වලට හරවනවා
+            # 📈 Premium Quality: Yavagalu garrishta (highest) quality matra
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
