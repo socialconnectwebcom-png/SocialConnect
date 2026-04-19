@@ -29,6 +29,9 @@
 
         .glowing-logo { animation: glowing 3s infinite; border-radius: 50%; padding: 4px; border: 1px solid rgba(255,255,255,0.15); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         @keyframes glowing { 0% { box-shadow: 0 0 5px rgba(255,255,255,0.2); opacity: 0.7;} 50% { box-shadow: 0 0 20px rgba(255,255,255,0.5); opacity: 1;} 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); opacity: 0.7;} }
+        .glow-tiktok { color: #00f2ea; border-color: rgba(0,242,234,0.3); } .glow-pinterest { color: #bd081c; border-color: rgba(189,8,28,0.3); }
+        .glow-youtube { color: #ff0000; border-color: rgba(255,0,0,0.3); } .glow-facebook { color: #1877f2; border-color: rgba(24,119,242,0.3); }
+        .glow-instagram { color: #c32aa3; border-color: rgba(195,42,163,0.3); } .glow-any { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
         
         .input-3d { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); transition: all 0.3s ease; box-shadow: inset 0 4px 15px rgba(0,0,0,0.8); }
         .input-3d:focus { border-color: #38bdf8; box-shadow: inset 0 4px 15px rgba(0,0,0,0.8), 0 0 25px rgba(56,189,248,0.3); outline: none; }
@@ -57,13 +60,13 @@
             <h1 class="text-4xl md:text-5xl lg:text-7xl font-black mb-4 glass-text uppercase tracking-tight">Universal <br/>Video Downloader</h1>
             <p class="text-slate-300 text-sm md:text-lg mb-8 font-light">Download <strong class="text-white">TikTok without watermark</strong>, HD Pinterest videos, and YouTube MP4/MP3 instantly.</p>
             
-            <div class="flex flex-wrap justify-center gap-4 md:gap-6 mb-10">
-                <div class="glowing-logo"><i class="fa-brands fa-tiktok text-2xl text-cyan-400"></i></div>
-                <div class="glowing-logo"><i class="fa-brands fa-pinterest text-2xl text-red-500"></i></div>
-                <div class="glowing-logo"><i class="fa-brands fa-youtube text-2xl text-red-600"></i></div>
-                <div class="glowing-logo"><i class="fa-brands fa-facebook text-2xl text-blue-600"></i></div>
-                <div class="glowing-logo"><i class="fa-brands fa-instagram text-2xl text-pink-500"></i></div>
-                <div class="glowing-logo"><i class="fa-solid fa-link text-2xl text-cyan-400"></i></div>
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6 mb-10 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-tiktok"><i class="fa-brands fa-tiktok text-2xl"></i></div>
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-pinterest"><i class="fa-brands fa-pinterest text-2xl"></i></div>
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-youtube"><i class="fa-brands fa-youtube text-2xl"></i></div>
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-facebook"><i class="fa-brands fa-facebook text-2xl"></i></div>
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-instagram"><i class="fa-brands fa-instagram text-2xl"></i></div>
+                <div class="flex flex-col items-center gap-1 glowing-logo glow-any"><i class="fa-solid fa-link text-2xl"></i></div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 mb-6 relative">
@@ -87,11 +90,11 @@
                             <div class="flex flex-col gap-3">
                                 <button onclick="handleVideoDownload('normal', this)" class="btn-3d w-full py-4 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 flex justify-between px-6 items-center">
                                     <span class="btn-text">Download Video (Normal)</span>
-                                    <span class="text-slate-500 font-normal">480p SD</span>
+                                    <span class="text-slate-500 font-normal">Standard HD</span>
                                 </button>
                                 <button onclick="handleVideoDownload('premium', this)" class="btn-3d w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400/50 rounded-xl text-xs font-bold flex justify-between px-6 items-center">
                                     <span class="btn-text text-white">Download Video High Quality</span>
-                                    <span class="bg-yellow-400 text-black px-2 py-1 rounded text-[10px] font-black animate-pulse">Ultra HD</span>
+                                    <span class="bg-yellow-400 text-black px-2 py-1 rounded text-[10px] font-black animate-pulse">AD</span>
                                 </button>
                             </div>
                         </div>
@@ -110,69 +113,69 @@
 
     <div id="seo-content" class="max-w-7xl mx-auto px-6 py-24 mt-10 relative z-10">
         <div class="text-center mb-16 reveal">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 uppercase tracking-tighter">The Ultimate Downloader</h2>
-            <p class="text-slate-400 max-w-3xl mx-auto text-sm md:text-base">Why use multiple websites when you have one powerful, fast, and 100% free tool? SocialConnect is perfectly optimized for your mobile device and editing workflow with advanced server-side spoofing technology to bypass restrictions.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">The Ultimate Downloader for Every Platform</h2>
+            <p class="text-slate-400 max-w-3xl mx-auto">Why use multiple websites when you have one powerful, fast, and 100% free tool? SocialConnect is perfectly optimized for your mobile device and editing workflow with advanced server-side spoofing technology to bypass restrictions.</p>
         </div>
         
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#00f2ea] mb-3"><i class="fa-brands fa-tiktok mr-2"></i>TikTok Downloader</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Looking to <strong class="text-white font-semibold">download TikTok videos without watermark</strong>? Our advanced engine removes the watermark automatically, providing you with crystal clear 1080p MP4 files ready for editing or reposting.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Looking to <strong class="text-white font-semibold">download TikTok videos without watermark</strong>? Our advanced engine removes the watermark automatically, providing you with crystal clear 1080p MP4 files ready for editing or reposting.</p>
             </div>
             
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#bd081c] mb-3"><i class="fa-brands fa-pinterest mr-2"></i>Pinterest Video Saver</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Found an aesthetic video or idea? Use our powerful <strong class="text-white font-semibold">Pinterest video downloader</strong> to save high-quality pins, story pins, and video tutorials directly to your device storage.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Found an aesthetic video or idea? Use our powerful <strong class="text-white font-semibold">Pinterest video downloader</strong> to save high-quality pins, story pins, and video tutorials directly to your device storage.</p>
             </div>
             
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#ff0000] mb-3"><i class="fa-brands fa-youtube mr-2"></i>YouTube to MP4 & MP3</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Easily convert and <strong class="text-white font-semibold">download YouTube Shorts and Videos</strong> in high quality. We use multiple backup server routing to guarantee flawless, high-speed downloads without bot errors.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Easily convert and <strong class="text-white font-semibold">download YouTube Shorts and Videos</strong> in high quality. We use advanced Android client spoofing to guarantee flawless downloads without bot errors.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#1877f2] mb-3"><i class="fa-brands fa-facebook mr-2"></i>Facebook Downloader</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Save <strong class="text-white font-semibold">Facebook Reels and Watch videos</strong> directly to your mobile gallery. Full backend support for extracting both public and private video links in standard and stunning HD quality.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Save <strong class="text-white font-semibold">Facebook Reels and Watch videos</strong> directly to your mobile gallery. Support for both public and private video links in standard and HD quality.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#c32aa3] mb-3"><i class="fa-brands fa-instagram mr-2"></i>Instagram Reel Saver</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Download <strong class="text-white font-semibold">Instagram Reels, Stories, and IGTV</strong> instantly. Just copy the share link and paste it here to get your content in the original high quality format seamlessly.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Download <strong class="text-white font-semibold">Instagram Reels, Stories, and IGTV</strong> instantly. Just copy the share link and paste it here to get your content in original quality.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-gray-300 mb-3"><i class="fa-brands fa-x-twitter mr-2"></i>Twitter (X) Downloader</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Download <strong class="text-white font-semibold">Twitter videos and GIFs</strong> instantly. Never lose a viral tweet or meme again; save them directly as universal MP4 files to share anywhere.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Download <strong class="text-white font-semibold">Twitter videos and GIFs</strong> instantly. Never lose a viral tweet again; save them directly as MP4 files.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#fffc00] mb-3"><i class="fa-brands fa-snapchat mr-2 text-black bg-[#fffc00] rounded-full p-1"></i>Snapchat Spotlight</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Save viral <strong class="text-white font-semibold">Snapchat Spotlight videos</strong> securely. Download your favorite snaps and creator content in high quality before they disappear from the feed forever.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Save viral <strong class="text-white font-semibold">Snapchat Spotlight videos</strong> securely. Download your favorite snaps before they disappear forever.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#0a66c2] mb-3"><i class="fa-brands fa-linkedin mr-2"></i>LinkedIn Video Saver</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Download professional <strong class="text-white font-semibold">LinkedIn videos</strong>, educational courses, and business presentations to watch offline during your commute or share with your network.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Download professional <strong class="text-white font-semibold">LinkedIn videos</strong>, courses, and presentations to watch offline or share with your network.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#ff4500] mb-3"><i class="fa-brands fa-reddit mr-2"></i>Reddit Downloader</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Easily extract and save <strong class="text-white font-semibold">Reddit videos with original audio</strong>. Our backend server automatically merges the separated video and audio streams for you.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Easily extract and save <strong class="text-white font-semibold">Reddit videos with audio</strong>. Our tool automatically merges the separated video and audio streams for you.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#9146ff] mb-3"><i class="fa-brands fa-twitch mr-2"></i>Twitch Clip Saver</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Save your absolute favorite gaming moments. Download <strong class="text-white font-semibold">Twitch Clips and full VODs</strong> in 1080p 60fps to create the ultimate gaming highlight montage.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Save your favorite gaming moments. Download <strong class="text-white font-semibold">Twitch Clips and VODs</strong> to create the ultimate gaming montage.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#ff5500] mb-3"><i class="fa-brands fa-soundcloud mr-2"></i>SoundCloud to MP3</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Convert and <strong class="text-white font-semibold">download SoundCloud tracks</strong> in crisp 192kbps MP3 format. Build your personalized offline music library effortlessly with our audio extractor.</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Convert and <strong class="text-white font-semibold">download SoundCloud tracks</strong> in 192kbps MP3 format. Build your offline music library effortlessly.</p>
             </div>
 
             <div class="glass-panel p-6 rounded-2xl reveal">
                 <h3 class="text-xl font-bold text-[#38bdf8] mb-3"><i class="fa-solid fa-link mr-2"></i>1000+ Other Sites</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Our universal backend engine, powered by the latest yt-dlp technology, supports over <strong class="text-white font-semibold">1000+ global websites</strong>. If it has a video, we can probably download it!</p>
+                <p class="text-sm text-slate-400 leading-relaxed mb-3">Our universal backend engine, powered by yt-dlp, supports over <strong class="text-white font-semibold">1000+ websites</strong>. If it has a video, we can probably download it!</p>
             </div>
         </div>
     </div>
@@ -197,10 +200,10 @@
     </div>
 
     <div id="termsModal" class="policy-modal">
-        <div class="glass-panel max-w-2xl mx-auto my-10 p-8 rounded-2xl relative text-left">
+        <div class="glass-panel max-w-2xl mx-auto my-10 p-8 rounded-2xl relative">
             <button onclick="toggleModal('termsModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
             <h2 class="text-2xl font-bold text-cyan-400 mb-6">Terms of Service</h2>
-            <div class="text-slate-300 text-sm leading-relaxed space-y-4">
+            <div class="text-slate-300 text-sm leading-relaxed space-y-4 text-left">
                 <p>1. **Acceptance:** By using SocialConnect, you agree to these terms.</p>
                 <p>2. **Usage:** This tool is for personal use only.</p>
                 <p>3. **Disclaimer:** SocialConnect does not host any copyrighted content.</p>
@@ -209,10 +212,10 @@
     </div>
 
     <div id="privacyModal" class="policy-modal">
-        <div class="glass-panel max-w-2xl mx-auto my-10 p-8 rounded-2xl relative text-left">
+        <div class="glass-panel max-w-2xl mx-auto my-10 p-8 rounded-2xl relative">
             <button onclick="toggleModal('privacyModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
             <h2 class="text-2xl font-bold text-purple-400 mb-6">Privacy Policy</h2>
-            <div class="text-slate-300 text-sm leading-relaxed space-y-4">
+            <div class="text-slate-300 text-sm leading-relaxed space-y-4 text-left">
                 <p>1. **Data Collection:** We do NOT store your personal data or your download history.</p>
                 <p>2. **Security:** We prioritize the safety of our users.</p>
             </div>
@@ -329,35 +332,43 @@
             }
         }
 
-        // 🚀 පට්ටම විසඳුම: API සර්වර්ස් 5ක්! එකක් වැඩ නැත්නම් අනිත් එකට ඔටෝම මාරු වෙනවා.
+        // 🚀 අලුත්ම සහ වැඩ කරන API Servers (Strict Payload) 400 Error Fix එක
         async function triggerYouTubeDownload(quality, btnElement, originalText, isAudio) {
             let vq = quality === 'premium' ? "1080" : "480";
             
             const apiEndpoints = [
-                "https://api.cobalt.tools/api/json",
-                "https://co.wuk.sh/api/json",
-                "https://cobalt.qewertyw.dev/api/json",
-                "https://cobalt.catterall.me/api/json",
-                "https://api.cobalt.tools/"
+                "https://api.cobalt.tools/", 
+                "https://cobalt-api.kwiateks.com/",
+                "https://co.e-z.host/",
+                "https://cobalt.jayw.uk/",
+                "https://cobalt.mrcyjanek.net/"
             ];
 
             let success = false;
+            
+            // Payload එක අලුත් Cobalt v7 එකට ගැලපෙන්න හැදුවා (වැඩකට නැති කෑලි අයින් කළා 400 Error එක එන්නේ නැති වෙන්න)
+            let payload = {
+                url: currentVideoData.original_url
+            };
+            
+            if (isAudio) {
+                payload.isAudioOnly = true;
+            } else {
+                payload.videoQuality = vq;
+            }
 
             for (let api of apiEndpoints) {
                 try {
                     const res = await fetch(api, {
                         method: "POST",
-                        headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            url: currentVideoData.original_url, 
-                            vQuality: vq, 
-                            videoQuality: vq, 
-                            isAudioOnly: isAudio, 
-                            filenamePattern: "classic" 
-                        })
+                        headers: { 
+                            "Accept": "application/json", 
+                            "Content-Type": "application/json" 
+                        },
+                        body: JSON.stringify(payload)
                     });
 
-                    if (!res.ok) continue; // මේ සර්වර් එක Busy නම්, ඊළඟ සර්වර් එකට යනවා.
+                    if (!res.ok) continue;
 
                     const data = await res.json();
                     
@@ -369,15 +380,15 @@
                         link.click();
                         document.body.removeChild(link);
                         success = true;
-                        break; // ඩවුන්ලෝඩ් එක සාර්ථකයි නම් ලූප් එකෙන් එළියට එනවා.
+                        break; 
                     }
                 } catch(e) {
-                    console.log("API failed, trying next mirror: " + api);
+                    console.log("API failed: " + api);
                 }
             }
 
             if (!success) {
-                alert("🔴 Download failed. All public servers are busy right now. Please try again in a few minutes.");
+                alert("🔴 Download failed. All public servers are busy or blocked. Please try again later.");
             }
 
             btnElement.querySelector('.btn-text').innerText = originalText;
