@@ -26,8 +26,11 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'noplaylist': True,
-            # 🚀 Bot Error එක මගහරින අලුත්ම Bypass එක (No Cookies)
-            'extractor_args': {'youtube': ['player_client=ios,android,web']}
+            # 🚀 පට්ටම Bypass එක: Web එක අයින් කරලා Android විතරක් තියනවා.
+            'extractor_args': {'youtube': ['player_client=android']},
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -48,7 +51,6 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
-    # ෆයිල් නම හැදීම
     safe_title = "".join([c for c in title if c.isalnum() or c==' ']).strip()
     if not safe_title:
         safe_title = "SocialConnect_Media"
@@ -59,7 +61,10 @@ def proxy_download():
             'quiet': True,
             'no_warnings': True,
             'noplaylist': True,
-            'extractor_args': {'youtube': ['player_client=ios,android,web']}
+            'extractor_args': {'youtube': ['player_client=android']},
+            'http_headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
         }
 
         if quality == 'audio':
@@ -73,14 +78,12 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 අඩු කොලිටිය - 480p (AV1 මගහැර H.264/MP4 ගැනීම)
             ydl_opts['format'] = 'bestvideo[height<=480][vcodec^=avc1]+bestaudio[ext=m4a]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 උපරිම කොලිටිය - Premium (AV1 මගහැර H.264/MP4 ගැනීම)
             ydl_opts['format'] = 'bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
