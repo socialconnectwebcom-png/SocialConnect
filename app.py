@@ -22,8 +22,6 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
-        # මෙතනින් අර Pinterest වලට අවුල් ගිය 'format': 'b' කෑල්ල අයින් කළා. 
-        # දැන් ඕනෑම ලින්ක් එකක් අවුලක් නැතුව Fetch වෙනවා.
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
@@ -77,14 +75,16 @@ def proxy_download():
             download_filename = f"{safe_title}.{ext}"
 
         elif quality == 'normal':
-            ydl_opts['format'] = 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            # Pinterest / TikTok වගේ ඒවට Support කරන විදිහට හැදුවා (/best/b එකතු කළා)
+            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/b'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
             download_filename = f"{safe_title}.mp4"
 
         else:
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            # Pinterest / TikTok වල Premium එකට Support කරන විදිහට හැදුවා (/best/b එකතු කළා)
+            ydl_opts['format'] = 'bestvideo+bestaudio/best/b'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
             final_filepath = f"{base_path}.mp4"
