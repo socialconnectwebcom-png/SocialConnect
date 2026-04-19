@@ -26,8 +26,8 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'noplaylist': True,
-            'cookiefile': 'cookies.txt', # 🚀 කුකීස් ෆයිල් එක ආයෙත් එකතු කළා
-            'extractor_args': {'youtube': ['player_client=android']}
+            # 🚀 කුකීස් අයින් කළා. අලුත්ම iOS/Android Bypass එක දානවා.
+            'extractor_args': {'youtube': ['player_client=ios,android,web']}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -58,8 +58,7 @@ def proxy_download():
             'quiet': True,
             'no_warnings': True,
             'noplaylist': True,
-            'cookiefile': 'cookies.txt', # 🚀 මෙතනටත් කුකීස් එකතු කළා
-            'extractor_args': {'youtube': ['player_client=android']}
+            'extractor_args': {'youtube': ['player_client=ios,android,web']}
         }
 
         if quality == 'audio':
