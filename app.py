@@ -22,11 +22,7 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
-        ydl_opts = {
-            'quiet': True, 
-            'no_warnings': True,
-            'noplaylist': True
-        }
+        ydl_opts = {'quiet': True, 'no_warnings': True, 'noplaylist': True}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return jsonify({
@@ -70,17 +66,18 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality (480p හෝ ඊට අඩු, Data ඉතුරු වෙන්න)
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best/b'
+            # 📉 Normal Quality: 480p හෝ ඊට අඩු එකක්ම බල කරනවා
+            # මම මෙතන 'format_sort' එකෙන් 480p වලට ප්‍රමුඛතාවය දුන්නා
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
+            ydl_opts['format_sort'] = ['res:480', 'ext:mp4:m4a']
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality (Strictly Force Highest Resolution)
-            # මේකෙන් අනිවාර්යයෙන්ම තියෙන උපරිම කොලිටිය බලෙන් ඇදලා ගන්නවා
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best[ext=mp4]/best'
-            ydl_opts['format_sort'] = ['res', 'vcodec:h264', 'ext:mp4:m4a'] # Resolution එකට මුල් තැන දෙනවා
+            # 📈 Premium Quality: උපරිම එක බලෙන් ගන්නවා
+            ydl_opts['format'] = 'bestvideo+bestaudio/best'
+            ydl_opts['format_sort'] = ['res', 'ext:mp4:m4a'] # Resolution එක තමයි ප්ලෑන් එක
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
@@ -93,10 +90,11 @@ def proxy_download():
         if os.path.exists(final_path):
             return send_file(final_path, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
         else:
+            # Fallback for file with extension in name
             for f in os.listdir(DOWNLOAD_DIR):
                 if safe_title in f:
                     return send_file(os.path.join(DOWNLOAD_DIR, f), as_attachment=True)
-            return "File not found after download", 404
+            return "File not found", 404
 
     except Exception as e:
         return str(e), 500
