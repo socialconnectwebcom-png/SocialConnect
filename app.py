@@ -66,11 +66,8 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality: 
-            # මුලින්ම 480p හෝ ඊට අඩු එකක් හොයනවා. ඒක නැත්නම් තියෙන සවුත්තුම (worst) එක හොයනවා.
-            # ඒ කිසිම දෙයක් නැතුව Pinterest වගේ සයිට් එකක තියෙන්නේ එකම එක ෆයිල් එකක් නම්, 
-            # Error එකක් දෙන්නේ නැතුව ඒ තියෙන එකම ෆයිල් එක දෙනවා (/best).
-            ydl_opts['format'] = 'best[height<=480]/worstvideo+worstaudio/worst/best'
+            # 📉 Normal Quality: (බිස්නස් ට්‍රික් එක - Normal එකටත් Premium කොලිටියම දෙනවා)
+            ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
