@@ -59,8 +59,8 @@ def proxy_download():
         }
 
         if quality == 'audio':
-            # 🎵 High Quality 320kbps MP3
-            ydl_opts['format'] = 'bestaudio/best'
+            # 🎵 Music: තියෙන හොඳම ඕඩියෝ එක කොහොම හරි අරන් MP3 කරනවා
+            ydl_opts['format'] = 'bestaudio/best/b'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -70,15 +70,15 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality - Pinterest Error එක මගහැරීමට "/best" fallback එක දැම්මා
-            ydl_opts['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480]/best'
+            # 📉 Normal: Pinterest Error Fix! (තියෙන ඕනෑම ෆෝමැට් එකක් ගන්නවා)
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best/b'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality - උපරිම කොලිටිය
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best'
+            # 📈 Premium: උපරිම කොලිටිය (බැරිම වුණොත් තියෙන එකක් ගන්නවා)
+            ydl_opts['format'] = 'bestvideo+bestaudio/best/b'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
