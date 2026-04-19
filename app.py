@@ -22,12 +22,12 @@ def fetch_video():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
-        # Shorts වල format error එන එක නවත්තන්න 'b' දැම්මා
+        # මෙතනින් අර Pinterest වලට අවුල් ගිය 'format': 'b' කෑල්ල අයින් කළා. 
+        # දැන් ඕනෑම ලින්ක් එකක් අවුලක් නැතුව Fetch වෙනවා.
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
             'cookiefile': 'cookies.txt',
-            'format': 'b',
             'noplaylist': True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -93,7 +93,6 @@ def proxy_download():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        # Download වුණ file එක හරියටම අල්ලගන්න Backup logic එක
         if not os.path.exists(final_filepath):
             for f in os.listdir(DOWNLOAD_DIR):
                 if safe_title in f and f.endswith(ext if quality == 'audio' else 'mp4'):
