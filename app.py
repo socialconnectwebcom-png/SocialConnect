@@ -55,7 +55,7 @@ def proxy_download():
         }
 
         if quality == 'audio':
-            # 🎵 High Quality 320kbps MP3
+            # 🎵 Music: තියෙන හොඳම ඕඩියෝ එක
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
@@ -66,14 +66,14 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality: 480p hudukuttade, illavendare kanishta (worst) quality padeyuttade
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/worst'
+            # 📉 Normal Quality: 480p හෝ ඊට අඩු එකක් හොයනවා. නැත්නම් අනිවාර්යයෙන්ම තියෙන සවුත්තුම (worst) එක ගන්නවා.
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/worstvideo+worstaudio/worst'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality: Yavagalu garrishta (highest) quality matra
+            # 📈 Premium Quality: උපරිම කොලිටියම විතරක් ගන්නවා.
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
