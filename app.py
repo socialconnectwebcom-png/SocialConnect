@@ -6,6 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+# ඩවුන්ලෝඩ් ෆෝල්ඩරය හැදීම
 DOWNLOAD_DIR = "downloads"
 if not os.path.exists(DOWNLOAD_DIR):
     os.makedirs(DOWNLOAD_DIR)
@@ -26,7 +27,7 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'noplaylist': True,
-            # YouTube Bot check එක bypass කරන Android trick එක
+            # 🚀 Hacker Trick: Android client එකක් විදිහට පෙනී සිටීම (No Cookies needed)
             'extractor_args': {'youtube': ['player_client=android']}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -43,7 +44,6 @@ def fetch_video():
 def proxy_download():
     url = request.args.get('url')
     title = request.args.get('title', 'SocialConnect_Download')
-    ext = request.args.get('ext', 'mp4') 
     quality = request.args.get('quality', 'premium')
 
     if not url:
@@ -53,11 +53,9 @@ def proxy_download():
     if not safe_title:
         safe_title = "SocialConnect_Media"
 
-    base_path = os.path.join(DOWNLOAD_DIR, safe_title)
-
     try:
         ydl_opts = {
-            'outtmpl': f"{base_path}.%(ext)s",
+            'outtmpl': f"{DOWNLOAD_DIR}/{safe_title}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
             'noplaylist': True,
@@ -75,35 +73,37 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # අඩු කොලිටිය (480p හෝ ඊට අඩු)
+            # 📉 අඩු කොලිටිය (480p වලට සීමා කිරීම)
             ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
             ext = 'mp4'
+            mimetype = 'video/mp4'
 
         else:
-            # උපරිම කොලිටිය (Premium)
+            # 📈 උපරිම කොලිටිය (1080p / 4K / Best available)
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
-            mimetype = 'video/mp4'
             ext = 'mp4'
+            mimetype = 'video/mp4'
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        final_filepath = f"{base_path}.{ext}"
+        final_path = f"{DOWNLOAD_DIR}/{safe_title}.{ext}"
         
-        # File එකක් හොයාගන්න බැරි වුණොත් Backup එකක් විදිහට පරීක්ෂා කිරීම
-        if not os.path.exists(final_filepath):
+        # File එක තියෙනවද කියලා check කරලා යැවීම
+        if os.path.exists(final_path):
+            return send_file(final_path, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
+        else:
+            # Backup: extension එක වෙනස් වෙලා තිබුණොත් ඒක අල්ලගන්නවා
             for f in os.listdir(DOWNLOAD_DIR):
                 if safe_title in f:
-                    final_filepath = os.path.join(DOWNLOAD_DIR, f)
-                    break
-
-        return send_file(final_filepath, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
+                    return send_file(os.path.join(DOWNLOAD_DIR, f), as_attachment=True)
+            return "File not found after download", 404
 
     except Exception as e:
         return str(e), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
+    # Railway එකේ PORT එකට ගැලපෙන්න dynamic විදිහට port එක ගනියි
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
