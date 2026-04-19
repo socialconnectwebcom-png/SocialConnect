@@ -67,17 +67,16 @@ def proxy_download():
         
         elif quality == 'normal':
             # 📉 Normal Quality: 480p හෝ ඊට අඩු එකක්ම බල කරනවා
-            # මම මෙතන 'format_sort' එකෙන් 480p වලට ප්‍රමුඛතාවය දුන්නා
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best'
             ydl_opts['format_sort'] = ['res:480', 'ext:mp4:m4a']
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality: උපරිම එක බලෙන් ගන්නවා
+            # 📈 Premium Quality: Absolute Highest Quality (4K/1080p)
+            # කිසිම සීමාවක් නෑ, තියෙන උපරිම කොලිටිය අරන් MP4 වලට හරවනවා
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
-            ydl_opts['format_sort'] = ['res', 'ext:mp4:m4a'] # Resolution එක තමයි ප්ලෑන් එක
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
@@ -90,7 +89,6 @@ def proxy_download():
         if os.path.exists(final_path):
             return send_file(final_path, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
         else:
-            # Fallback for file with extension in name
             for f in os.listdir(DOWNLOAD_DIR):
                 if safe_title in f:
                     return send_file(os.path.join(DOWNLOAD_DIR, f), as_attachment=True)
