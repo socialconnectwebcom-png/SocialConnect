@@ -26,7 +26,7 @@ def fetch_video():
             'quiet': True, 
             'no_warnings': True,
             'noplaylist': True,
-            # 🚀 Android Phone එකක් විදිහට යූටියුබ් එක රවට්ටන කෑල්ල (Cookies ඕනේ නෑ)
+            # YouTube Bot check එක bypass කරන Android trick එක
             'extractor_args': {'youtube': ['player_client=android']}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -49,9 +49,9 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
-    safe_title = "".join([c for c in title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
+    safe_title = "".join([c for c in title if c.isalnum() or c==' ']).strip()
     if not safe_title:
-        safe_title = "SocialConnect_Audio_Video"
+        safe_title = "SocialConnect_Media"
 
     base_path = os.path.join(DOWNLOAD_DIR, safe_title)
 
@@ -61,7 +61,6 @@ def proxy_download():
             'quiet': True,
             'no_warnings': True,
             'noplaylist': True,
-            # 🚀 මෙතනත් ඒ ට්‍රික් එක දානවා
             'extractor_args': {'youtube': ['player_client=android']}
         }
 
@@ -69,40 +68,42 @@ def proxy_download():
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': ext, 
+                'preferredcodec': 'mp3',
                 'preferredquality': '192',
             }]
-            mimetype = f'audio/{ext}'
-            final_filepath = f"{base_path}.{ext}"
-            download_filename = f"{safe_title}.{ext}"
-
+            ext = 'mp3'
+            mimetype = 'audio/mpeg'
+        
         elif quality == 'normal':
-            ydl_opts['format'] = 'bestvideo[height<=720]+bestaudio/best[height<=720]/best/b'
+            # අඩු කොලිටිය (480p හෝ ඊට අඩු)
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
-            final_filepath = f"{base_path}.mp4"
-            download_filename = f"{safe_title}.mp4"
+            ext = 'mp4'
 
         else:
-            ydl_opts['format'] = 'bestvideo+bestaudio/best/b'
+            # උපරිම කොලිටිය (Premium)
+            ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             mimetype = 'video/mp4'
-            final_filepath = f"{base_path}.mp4"
-            download_filename = f"{safe_title}.mp4"
+            ext = 'mp4'
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
+        final_filepath = f"{base_path}.{ext}"
+        
+        # File එකක් හොයාගන්න බැරි වුණොත් Backup එකක් විදිහට පරීක්ෂා කිරීම
         if not os.path.exists(final_filepath):
             for f in os.listdir(DOWNLOAD_DIR):
-                if safe_title in f and f.endswith(ext if quality == 'audio' else 'mp4'):
+                if safe_title in f:
                     final_filepath = os.path.join(DOWNLOAD_DIR, f)
                     break
 
-        return send_file(final_filepath, as_attachment=True, download_name=download_filename, mimetype=mimetype)
+        return send_file(final_filepath, as_attachment=True, download_name=f"{safe_title}.{ext}", mimetype=mimetype)
 
     except Exception as e:
         return str(e), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
