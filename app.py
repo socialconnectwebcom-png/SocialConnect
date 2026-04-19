@@ -55,7 +55,7 @@ def proxy_download():
         }
 
         if quality == 'audio':
-            # 🎵 Music: තියෙන හොඳම ඕඩියෝ එක
+            # 🎵 High Quality 320kbps MP3 - Music Section
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
@@ -66,14 +66,15 @@ def proxy_download():
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality: 480p හෝ ඊට අඩු එකක් හොයනවා. නැත්නම් අනිවාර්යයෙන්ම තියෙන සවුත්තුම (worst) එක ගන්නවා.
-            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/worstvideo+worstaudio/worst'
+            # 📉 Normal: බලෙන්ම 480p වලට Resize කරලා සයිස් එක අඩු කරනවා
+            ydl_opts['format'] = 'bestvideo[height<=480]+bestaudio/best[height<=480]/best[height<=480]/best'
+            ydl_opts['postprocessor_args'] = ['-vf', 'scale=-2:480']
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality: උපරිම කොලිටියම විතරක් ගන්නවා.
+            # 📈 Premium: කිසිම සීමාවක් නැති උපරිම මුල් කොලිටිය (Best Original)
             ydl_opts['format'] = 'bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
