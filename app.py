@@ -25,12 +25,7 @@ def fetch_video():
         ydl_opts = {
             'quiet': True, 
             'no_warnings': True,
-            'noplaylist': True,
-            # 🚀 පට්ටම Bypass එක: Web එක අයින් කරලා Android විතරක් තියනවා.
-            'extractor_args': {'youtube': ['player_client=android']},
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
+            'noplaylist': True
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -51,6 +46,7 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
+    # විශේෂ අකුරු අයින් කරලා ෆයිල් නම හදනවා
     safe_title = "".join([c for c in title if c.isalnum() or c==' ']).strip()
     if not safe_title:
         safe_title = "SocialConnect_Media"
@@ -60,31 +56,30 @@ def proxy_download():
             'outtmpl': f"{DOWNLOAD_DIR}/{safe_title}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
-            'noplaylist': True,
-            'extractor_args': {'youtube': ['player_client=android']},
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
+            'noplaylist': True
         }
 
         if quality == 'audio':
+            # 🎵 High Quality 320kbps MP3 (හැම ඩිවයිස් එකකම වැඩ)
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
-                'preferredquality': '192',
+                'preferredquality': '320', 
             }]
             ext = 'mp3'
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            ydl_opts['format'] = 'bestvideo[height<=480][vcodec^=avc1]+bestaudio[ext=m4a]/best[height<=480]/best'
+            # 📉 Normal Quality (480p MP4)
+            ydl_opts['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            ydl_opts['format'] = 'bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            # 📈 Premium Quality (Highest available MP4 - No AV1 errors)
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
