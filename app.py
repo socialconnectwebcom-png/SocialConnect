@@ -46,7 +46,6 @@ def proxy_download():
     if not url:
         return "URL is required", 400
 
-    # විශේෂ අකුරු අයින් කරලා ෆයිල් නම හදනවා
     safe_title = "".join([c for c in title if c.isalnum() or c==' ']).strip()
     if not safe_title:
         safe_title = "SocialConnect_Media"
@@ -60,26 +59,26 @@ def proxy_download():
         }
 
         if quality == 'audio':
-            # 🎵 High Quality 320kbps MP3 (හැම ඩිවයිස් එකකම වැඩ)
+            # 🎵 High Quality 320kbps MP3
             ydl_opts['format'] = 'bestaudio/best'
             ydl_opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
-                'preferredquality': '320', 
+                'preferredquality': '320',
             }]
             ext = 'mp3'
             mimetype = 'audio/mpeg'
         
         elif quality == 'normal':
-            # 📉 Normal Quality (480p MP4)
-            ydl_opts['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480][ext=mp4]/best[ext=mp4]/best'
+            # 📉 Normal Quality - Pinterest Error එක මගහැරීමට "/best" fallback එක දැම්මා
+            ydl_opts['format'] = 'bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/best[height<=480]/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
 
         else:
-            # 📈 Premium Quality (Highest available MP4 - No AV1 errors)
-            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
+            # 📈 Premium Quality - උපරිම කොලිටිය
+            ydl_opts['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best'
             ydl_opts['merge_output_format'] = 'mp4'
             ext = 'mp4'
             mimetype = 'video/mp4'
